@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style><!--
+    
+      @import url(http://fonts.googleapis.com/earlyaccess/notosansjp.css);
+      /*@import url('https://fonts.googleapis.com/css?family=Teko&display=swap');
+        @import url('https://fonts.googleapis.com/css?family=Electrolize&display=swap');*/
+
+      input[type="button"]{
+        display    : inline-block;
+        height     : 3em;
+        width      : 20em;  max-width   : 90vw;
+        padding    : 3px;   max-padding : 2vw;
+        margin     : 3px;   max-margin  : 2vw;
+        background : #EEE;
+        color      : #000;
+        border     : 0.1em solid #EEE;
+        border-radius: 0.5em;
+      }
+      input[type="button"]:active{
+      }
+      font.correct{
+        color:red;
+      }
+      font.incorrect{
+        color:blue;
+      }
+      body{
+        margin:0;padding:0;
+        font-weight: bold; font-size:1.2em;
+        font-family: 'Noto Sans JP';
+      }
+      div{
+        margin:auto;
+        width:24em;
+        max-width:99vw;
+        text-align:center;
+      }
+      section{
+        margin:0;
+        width:100vw;
+        text-align:center;
+      }
+      hr{
+        margin:auto;
+        width:24em;
+        max-width:99vw;
+      }
+      section#header{
+        background-color:#EEE;
+      }
+      section#stateSec{
+        background-color:#EEE;
+        min-height:1.2em;
+      }
+      section#buttons{
+        min-height:12em;
+      }
+      div#clock{
+        font-size:3em;
+      }
+      input[type="button"]{
+        display    : inline-block;
+        height     : 2em;
+        width      : 10em;  max-width   : 90vw;
+        padding    : 1px;   max-padding : 2vw;
+        margin     : 3px;   max-margin  : 2vw;
+        background : #EEE;
+        color      : #000;
+        border     : 0.1em solid #EEE;
+        border-radius: 0.5em;
+        font-weight: bold; font-size:1.5em;
+      }
+    --></style>
+    <script type="text/javascript"><!--
+      var hour;
+      var min;
+      var sec;
+      
+      
+      window.onload = function onload(){
+        indicateState();
+      }
+      
+      
+      function indicateState(){
+        google.script.run.withSuccessHandler(loadState).sendToHtml_state();
+        function loadState(data){
+          document.getElementById("state").innerHTML = data;
+          if(data=="未出勤")document.getElementById("stateSec").style.backgroundColor="#EEEEEE";
+          if(data=="勤務中")document.getElementById("stateSec").style.backgroundColor="#40e0d0";
+          if(data=="休憩中")document.getElementById("stateSec").style.backgroundColor="#98fb98";
+        }
+      }
+      
+      function sendToGas(mode){
+        var place    = "place";
+        var descript = "hoge";
+        
+        if(      mode=="goToWorkB"){
+          google.script.run.withSuccessHandler(gotFunc).goToWork("",place,descript,hour,min);
+        }else if(mode=="takeRecessB"){
+          google.script.run.withSuccessHandler(gotFunc).takeRecess(hour,min);
+        }else if(mode=="endRecessB"){
+          google.script.run.withSuccessHandler(gotFunc).endRecess(hour,min);
+        }else if(mode=="leaveWorkB"){
+          google.script.run.withSuccessHandler(gotFunc).leaveWork(hour,min);
+        }
+        
+        function gotFunc(data){
+          if(data== 0)/*正常*/;
+          if(data==-1)alert("現在の状態でその操作はできません．");
+          if(data==-2)alert("休憩回数が上限に達しました");
+          if(data==-3)alert("入力時間に誤りがあります");
+          if(data==-4)alert("入力時間に誤りがあります");
+          indicateState();
+        }
+      }
+      
+
+
+
+
+
+      function hideElemById(id)      {document.getElementById(id).style.display="none";}  
+      function showElemById_Block(id){document.getElementById(id).style.display="block";} 
+      
+
+
+  function zeroPad2fig(num) {
+    return ("00"+parseInt(num)).slice(-2);
+  }
+  function ClockF() {
+    var now = new Date();
+
+    hour = zeroPad2fig( now.getHours()  );  //Time.getHours()
+    min =  zeroPad2fig( now.getMinutes() ); //Time.getMinutes()
+    sec =  zeroPad2fig( now.getSeconds() );
+
+    var Year = now.getFullYear();
+    var Month= zeroPad2fig(now.getMonth() +1);
+    var Day  = zeroPad2fig( now.getDate() );
+
+    var date  =  Year + "/" + Month + "/" + Day;
+    var clock =  hour + ":" + min + ":" + sec;
+    
+    document.getElementById("calendar").innerHTML = date;
+    document.getElementById("clock").innerHTML = clock;
+  }
+  setInterval('ClockF()',1000);
+
+
+    // --></script>
+
+
+<!--△JavaScriptここまで△-->
+
+  </head>
+  
+
+  <body>
+    
+    <section id="header">
+      <div>セルフ勤怠くん</div>
+    </section>
+    <section id="stateSec">
+      <div id="state"></div>
+    </section>
+    <section id="clockSec">
+      <div id="calendar"></div>
+      <div id="clock"></div>
+    </section>
+    <section id="buttons">
+      <input type="button" id="goToWorkB" value="出勤" onclick="sendToGas(this.id)"><br>
+      <input type="button" id="takeRecessB" value="休憩開始" onclick="sendToGas(this.id)"><br>
+      <input type="button" id="endRecessB" value="休憩終了" onclick="sendToGas(this.id)"><br>
+      <input type="button" id="leaveWorkB" value="退勤" onclick="sendToGas(this.id)">
+    </section>
+   
+  </body>
+</html>
