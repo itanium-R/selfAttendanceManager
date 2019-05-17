@@ -1,0 +1,2 @@
+# selfAttendanceManager
+自分の労働時間をつけるためのWebアプリonGAS
