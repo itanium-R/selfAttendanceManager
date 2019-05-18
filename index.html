@@ -276,19 +276,17 @@
         function loadState(data){
           let state = data[0];
           document.getElementById("state").innerHTML = state;
+          document.getElementById("placeTxt").value   =data[1];
+          document.getElementById("descriptTxt").value=data[2];
           if(state=="未出勤"){
             initializeToOff();
           }
           if(state=="勤務中"){
-            document.getElementById("placeTxt").value   =data[1];
-            document.getElementById("descriptTxt").value=data[2];
             document.getElementById("placeTxt").disabled=true;
             document.getElementById("descriptTxt").disabled=true;
             initializeToWork();
           }
           if(state=="休憩中"){
-            document.getElementById("placeTxt").value   =data[1];
-            document.getElementById("descriptTxt").value=data[2];
             document.getElementById("placeTxt").disabled=true;
             document.getElementById("descriptTxt").disabled=true;
             initializeToRecess();
@@ -422,7 +420,7 @@
       <div id="clock"></div>
     </section>
     <section id="workInfoTxt">
-      <label>勤務地</label>
+      <label>場所</label>
       <input type="text" id="placeTxt"  onKeyDown="" 
         onFocus="" onblur=""
          style="" placeholder="" wrap="off" ><br>

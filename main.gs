@@ -5,6 +5,12 @@ function doGet() {
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
+// TODO : 勤務開始時間　休憩開始時間　経過時間の常時表示（html）
+// TODO : 日付をまたぐとエラーにする
+// TODO : 直近3件のデータはWebAppから確認(余裕があれば修正も)可能に
+// TODO : エラー処理（特にコード-3,-4）のリファクタリング
+// TODO : try catchでエラー時return -5
+
 // 勤務情報訂正
 // return :  0 正常終了
 //        : -1 異常終了：不正な状態遷移
@@ -17,10 +23,6 @@ function fixWorkInfo(place,descriptions){
   tcS.getRange(lastRow,3,1,2).setValues(record);
   
   return 0;
-}
-
-function test2(){
-  
 }
 
 // 出勤
@@ -214,8 +216,10 @@ function sendToHtml_state(){
   if(state=="inWork")  result[0] = "勤務中";
   if(state=="inRecess")result[0] = "休憩中";
   if(state=="off")     result[0] = "未出勤";
-  result[1]=record[0][1];
-  result[2]=record[0][2];
+  if(lastRow>2){
+    result[1]=record[0][1];
+    result[2]=record[0][2];
+  }
   Logger.log(result);
   return result;
 }
