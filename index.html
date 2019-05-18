@@ -261,6 +261,7 @@
       var hour;
       var min;
       var sec;
+      var isFixing = false;
       
       
       window.onload = function onload(){
@@ -300,6 +301,7 @@
         hideElemById("inWork"  );
         hideElemById("inRecess");
         hideElemById("fixWorkInfoSec");
+        focusElemById("placeTxt");
       }
       function initializeToWork(){
         document.getElementById("stateSec").style.backgroundColor="#40e0d0";
@@ -331,6 +333,7 @@
           google.script.run.withSuccessHandler(gotFunc).leaveWork(hour,min);
         }else if(mode=="fixB"){
           google.script.run.withSuccessHandler(gotFunc).fixWorkInfo(place,descript);
+          isFixing = false;
         }
         
         function gotFunc(data){
@@ -346,12 +349,38 @@
       }
       
       function fixWorkInfo(){
+          isFixing = true;
           document.getElementById("placeTxt").disabled   =false;
           document.getElementById("descriptTxt").disabled=false;
           hideElemById("off"     );
           hideElemById("inWork"  );
           hideElemById("inRecess");
           showElemById("fixWorkInfoSec","block");
+          focusElemById("placeTxt");
+      }
+      
+      function focusElemById(id){
+        document.getElementById(id).focus();
+      }
+      
+      function focusElemByIdByEnter(id){
+        if(window.event.keyCode==13){
+          focusElemById(id);
+          return false;
+        }
+        return true;
+      }
+      
+      function runSendScriptByEnter(){
+        if(window.event.keyCode==13){
+          if(isFixing){
+            sendToGas("fixB");
+          }else{
+            sendToGas("goToWorkB");
+          }
+          return false;
+        }
+        return true;
       }
       
 
@@ -421,12 +450,14 @@
     </section>
     <section id="workInfoTxt">
       <label>場所</label>
-      <input type="text" id="placeTxt"  onKeyDown="" 
-        onFocus="" onblur=""
+      <input type="text" id="placeTxt" 
+        onKeyDown="return focusElemByIdByEnter('descriptTxt')"
+        onFocus="this.select(0,this.value.length)" onblur=""
          style="" placeholder="" wrap="off" ><br>
       <label>作業内容</label>
-      <input type="text" id="descriptTxt"  onKeyDown="" 
-        onFocus="" onblur=""
+      <input type="text" id="descriptTxt"
+        onKeyDown="return runSendScriptByEnter();" 
+        onFocus="this.select(0,this.value.length)" onblur=""
          style="" placeholder="" wrap="off" ><br>
     </section>
     <section id="off">
@@ -438,8 +469,8 @@
       <input type="button" id="leaveWorkB"   value="退勤" onclick="sendToGas(this.id)">
     </section>
     <section id="inRecess">
-          <input type="button" id="endRecessB" value="休憩終了" onclick="sendToGas(this.id)"><br>
-          <input type="button" value="作業内容修正" onclick="fixWorkInfo()"><br>
+      <input type="button" id="endRecessB" value="休憩終了" onclick="sendToGas(this.id)"><br>
+      <input type="button" value="作業内容修正" onclick="fixWorkInfo()"><br>
     </section>
 
     <section id="fixWorkInfoSec">
