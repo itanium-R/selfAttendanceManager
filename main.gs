@@ -5,6 +5,24 @@ function doGet() {
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
+// 勤務情報訂正
+// return :  0 正常終了
+//        : -1 異常終了：不正な状態遷移
+function fixWorkInfo(place,descriptions){
+  var tcS=nameOpen("timeCard");
+  var lastRow = tcS.getLastRow();
+  var record  = tcS.getRange(lastRow,2,1,14).getValues();
+  if(getState(record,lastRow)=="off")return -1;
+  record = [[place,descriptions]];
+  tcS.getRange(lastRow,3,1,2).setValues(record);
+  
+  return 0;
+}
+
+function test2(){
+  
+}
+
 // 出勤
 // return :  0 正常終了
 //        : -1 異常終了：不正な状態遷移
@@ -13,11 +31,10 @@ function goToWork(date,place,descriptions,hour,minute){
   var lastRow = tcS.getLastRow();
   var record  = tcS.getRange(lastRow,2,1,14).getValues();
   if(getState(record,lastRow)!="off")return -1;
-  Logger.log("Work");
   if(!date)date=getDate();
   lastRow+=1;
   tcS.getRange(1,2,1,14).copyTo(tcS.getRange(lastRow,2,1,14));
-  var time = (("00"+parseInt(hour)).slice(-2))+":"+(("00"+parseInt(minute)).slice(-2));
+  var time = (("00"+(hour)).slice(-2))+":"+(("00"+(minute)).slice(-2));
   record = [[date,place,descriptions,time]];
   tcS.getRange(lastRow,2,1,4).setValues(record);
   
@@ -65,7 +82,7 @@ function takeRecess(hour,minute){
   if(isLater(hour,minute,startWorkHour,startWorkMin)==1)return -4;
 
   // 書込
-  var time = (("00"+parseInt(hour)).slice(-2))+":"+(("00"+parseInt(minute)).slice(-2));
+  var time = (("00"+(hour)).slice(-2))+":"+(("00"+(minute)).slice(-2));
   tcS.getRange(lastRow,recessIndex+2).setValue(time);
   return 0;
 }
@@ -97,7 +114,7 @@ function endRecess(hour,minute){
   if(isLater(hour,minute,startRecessHour,startRecessMin)==1)return -3;
 
   //書込
-  var time = (("00"+parseInt(hour)).slice(-2))+":"+(("00"+parseInt(minute)).slice(-2));
+  var time = (("00"+hour).slice(-2))+":"+(("00"+minute).slice(-2));
   tcS.getRange(lastRow,recessIndex+2).setValue(time);
   return 0;
 }
@@ -136,7 +153,7 @@ function leaveWork(hour,minute){
   if(isLater(hour,minute,startWorkHour,startWorkMin)==1)return -4;
 
   // 書込
-  var time = (("00"+parseInt(hour)).slice(-2))+":"+(("00"+parseInt(minute)).slice(-2));
+  var time = (("00"+(hour)).slice(-2))+":"+(("00"+(minute)).slice(-2));
   tcS.getRange(lastRow,6).setValue(time);
   return 0;
 }
@@ -179,8 +196,8 @@ function getState(record,lastRow){
 // return : 0 : hour0;min0 のほうが大きいか等しい
 // return : 1 : hour1;min1 のほうが大きい
 function isLater(hour0,min0,hour1,min1){
-  var time0=parseInt(hour0)*100+parseInt(min0);
-  var time1=parseInt(hour1)*100+parseInt(min1);
+  var time0=(hour0)*100+(min0);
+  var time1=(hour1)*100+(min1);
   if(time0<time1)return 1;
   else           return 0;
 }
@@ -192,10 +209,14 @@ function sendToHtml_state(){
   
   // 状態確認
   var state =getState(record,lastRow);
-  if(state=="inWork")  return "勤務中";
-  if(state=="inRecess")return "休憩中";
-  if(state=="off")     return "未出勤";
-  
+  var result = Array(3);
+  if(state=="inWork")  result[0] = "勤務中";
+  if(state=="inRecess")result[0] = "休憩中";
+  if(state=="off")     result[0] = "未出勤";
+  result[1]=record[0][1];
+  result[2]=record[0][2];
+  Logger.log(result);
+  return result;
 }
 //------------------------------------------------------------
 
