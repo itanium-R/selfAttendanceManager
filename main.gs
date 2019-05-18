@@ -32,6 +32,7 @@ function goToWork(date,place,descriptions,hour,minute){
   var record  = tcS.getRange(lastRow,2,1,14).getValues();
   if(getState(record,lastRow)!="off")return -1;
   if(!date)date=getDate();
+  tcS.insertRowAfter(lastRow);
   lastRow+=1;
   tcS.getRange(1,2,1,14).copyTo(tcS.getRange(lastRow,2,1,14));
   var time = (("00"+(hour)).slice(-2))+":"+(("00"+(minute)).slice(-2));
@@ -42,10 +43,10 @@ function goToWork(date,place,descriptions,hour,minute){
 }
 
 function test(){
-  //Logger.log(goToWork("","place","hoge",10,00));
+  Logger.log(goToWork("","place","hoge",10,00));
   //Logger.log(takeRecess(12,00));
   //Logger.log(endRecess(12,00));
-  leaveWork(17,00);
+  //leaveWork(17,00);
 }
 
 // 休憩開始
