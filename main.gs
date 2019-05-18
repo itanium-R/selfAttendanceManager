@@ -5,6 +5,17 @@ function doGet() {
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
+function showSidebar() {
+  
+  var htmlOutput = HtmlService.createTemplateFromFile("index").evaluate()
+    .setTitle('セルフ勤怠くん')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+
+  SpreadsheetApp.getUi().showSidebar(htmlOutput);
+}
+
+
 // TODO : 勤務開始時間　休憩開始時間　経過時間の常時表示（html）
 // TODO : 日付をまたぐとエラーにする
 // TODO : 直近3件のデータはWebAppから確認(余裕があれば修正も)可能に
