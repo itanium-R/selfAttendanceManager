@@ -261,6 +261,7 @@
       var hour;
       var min;
       var sec;
+      var date;
       var isFixing = false;
       
       
@@ -324,13 +325,13 @@
         var descript = document.getElementById("descriptTxt").value;
         
         if(      mode=="goToWorkB"){
-          google.script.run.withSuccessHandler(gotFunc).goToWork("",place,descript,hour,min);
+          google.script.run.withSuccessHandler(gotFunc).goToWork(date,place,descript,hour,min);
         }else if(mode=="takeRecessB"){
-          google.script.run.withSuccessHandler(gotFunc).takeRecess(hour,min);
+          google.script.run.withSuccessHandler(gotFunc).takeRecess(date,hour,min);
         }else if(mode=="endRecessB"){
-          google.script.run.withSuccessHandler(gotFunc).endRecess(hour,min);
+          google.script.run.withSuccessHandler(gotFunc).endRecess(date,hour,min);
         }else if(mode=="leaveWorkB"){
-          google.script.run.withSuccessHandler(gotFunc).leaveWork(hour,min);
+          google.script.run.withSuccessHandler(gotFunc).leaveWork(date,hour,min);
         }else if(mode=="fixB"){
           google.script.run.withSuccessHandler(gotFunc).fixWorkInfo(place,descript);
           isFixing = false;
@@ -383,16 +384,9 @@
         return true;
       }
       
-
-
-
-
-
       function hideElemById(id)        {document.getElementById(id).style.display="none";}  
       function showElemById(id,display){document.getElementById(id).style.display=display;} 
       
-
-
       function zeroPad2fig(num) {
         return ("00"+parseInt(num)).slice(-2);
       }
@@ -407,10 +401,10 @@
         var Month= zeroPad2fig(now.getMonth() +1);
         var Day  = zeroPad2fig( now.getDate() );
         
-        var date  =  Year + "/" + Month + "/" + Day;
+        date  =  Year + "/" + Month + "/" + Day;
         var clock =  hour + ":" + min + ":" + sec;
         
-        document.getElementById("calendar").innerHTML = date;
+        document.getElementById("dateDiv").innerHTML = date;
         document.getElementById("clock").innerHTML = clock;
       }
       setInterval('writeClock()',500);
@@ -445,7 +439,7 @@
       <div id="state"></div>
     </section>
     <section id="clockSec">
-      <div id="calendar"></div>
+      <div id="dateDiv"></div>
       <div id="clock"></div>
     </section>
     <section id="workInfoTxt">
