@@ -56,11 +56,23 @@ function goToWork(date,place,descriptions,hour,minute){
 }
 
 function test(){
-  Logger.log(goToWork("","place","hoge",10,00));
+  //Logger.log(goToWork("","place","hoge",10,00));
   //Logger.log(takeRecess(12,00));
   //Logger.log(endRecess(12,00));
   //leaveWork(17,00);
+  Logger.log(findDiffOfDate("2019/5/20","2019-05-21"));
 }
+
+// date2-date1の日数を計算し，intで返す
+function findDiffOfDate(date1,date2){
+  date1 = new Date(date1).setHours(0);
+  date2 = new Date(date2).setHours(0);
+  return ((date2-date1)/86400000);
+}
+
+
+
+
 
 // 休憩開始
 // return :  0 正常終了
