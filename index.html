@@ -45,6 +45,26 @@
       input[type="text"]:disabled{
         background-color:#EEE;
       }
+      input[type="date"]{
+        font-family: 'Noto Sans JP';
+        border:0;
+        text-align: center;
+        font-weight: bold; font-size:1.2em;
+        margin-left:2vw;
+        width: 10em;max-width: 78vw;
+        font-family: 'Noto Sans JP';
+        background-color: #FFF;
+      }
+      input[type="time"]{
+        font-family: 'Noto Sans JP';
+        font-weight: bold; font-size:3em;
+        border-width: 0;
+        resize: none;
+        margin-left: 8vw;
+        width: 10em;max-width: 72vw;
+        text-align: center;
+        background-color: #FFF;
+      }
 
       font.correct{
         color:red;
@@ -86,6 +106,7 @@
       }
       div#clock{
         font-size:3em;
+        border:0;
       }
       section#workInfoTxt{
         margin-bottom:1rem;
@@ -94,7 +115,7 @@
        /* -------------------------------------------------- */
       
       
-      #richAlert{
+      #richAlert,#timeInput{
         position:absolute;
         display: none;
         top:0; bottom:0; right:0; left:0;
@@ -105,7 +126,7 @@
         text-align: center;
         align-items: center;
       }
-      #richAlertInner{
+      #richAlertInner,#timeInputInner{
         width :18.0em;   max-width: 95vw;
         height:15.0em;   max-height:80vh;
         border: 0em none #FFF;
@@ -123,6 +144,16 @@
         margin:0.5em 0.5em 0 0.5em ;
         margin-buttom:0.5em;
         overflow-y:scroll;
+      }
+      #timeInputContent{
+        display: table-cell; 
+        vertical-align: middle;
+        margin-top:0.5em;
+        width :17.0em;   max-width :90vw;
+        height:10.0em;   max-height:50vh;
+        margin:0.5em 0.5em 0 0.5em ;
+        margin-buttom:0.5em;
+        overflow:hidden;
       }
       /* animation: fadeOut 2.0s 1 ease .5s forwards; */
       @keyframes fadeOutAlert {
@@ -258,15 +289,62 @@
       
     --></style>
     <script type="text/javascript"><!--
+      var year;
+      var month;
+      var day;
       var hour;
       var min;
       var sec;
       var date;
       var isFixing = false;
+      var isInputtedTimeAdopted = false;
       
       
       window.onload = function onload(){
         indicateState();
+        writeClock();
+      }
+      
+      function showTimeInput(){
+        if(isInputtedTimeAdopted){
+          isInputtedTimeAdopted = false;
+        }else{
+          isInputtedTimeAdopted=true;
+          initializeInput();
+          showElemById("timeInput","flex");
+        }
+      }
+      
+      function initializeInput(){
+        let today = year + "-" + zeroPad2fig(month) + "-" + zeroPad2fig(day);
+        document.getElementById("dateInp").max = today;
+        document.getElementById("dateInp").value = today;
+        document.getElementById("timeInp").value = hour+":"+min;
+      }
+      function setDateInRange(){
+        let dateVal = document.getElementById("dateInp").value;
+        let dateMax = document.getElementById("dateInp").max;
+        if(dateVal>dateMax){
+          document.getElementById("dateInp").value = dateMax;
+        }
+      }
+      
+      function adaptInputtedTime(){
+        let inputtedDate = document.getElementById("dateInp").value;
+        yaer  = inputtedDate.slice(0,4);
+        month = inputtedDate.slice(5,7);
+        day   = inputtedDate.slice(8,10);
+        let inputtedTime =document.getElementById("timeInp").value;
+        hour  = inputtedTime.slice(0,2);
+        min   = inputtedTime.slice(3,5);
+        
+        date  =  year + "/" + month + "/" + day;
+        var clock =  "◆" + hour + ":" + min + "◆";
+        
+        document.getElementById("dateDiv").innerHTML = date;
+        document.getElementById("clock").innerHTML = clock;
+        
+        hideElemById("timeInput");
       }
       
       
@@ -346,6 +424,7 @@
           
           hideLoading();
           indicateState();
+          isInputtedTimeAdopted = false;
         }
       }
       
@@ -391,21 +470,23 @@
         return ("00"+parseInt(num)).slice(-2);
       }
       function writeClock() {
+        if(isInputtedTimeAdopted)return -1;
         var now = new Date();
         
         hour = zeroPad2fig( now.getHours()  );  //Time.getHours()
         min =  zeroPad2fig( now.getMinutes() ); //Time.getMinutes()
         sec =  zeroPad2fig( now.getSeconds() );
         
-        var Year = now.getFullYear();
-        var Month= zeroPad2fig(now.getMonth() +1);
-        var Day  = zeroPad2fig( now.getDate() );
+        year = now.getFullYear();
+        month= zeroPad2fig(now.getMonth() +1);
+        day  = zeroPad2fig( now.getDate() );
         
-        date  =  Year + "/" + Month + "/" + Day;
+        date  =  year + "/" + month + "/" + day;
         var clock =  hour + ":" + min + ":" + sec;
         
         document.getElementById("dateDiv").innerHTML = date;
         document.getElementById("clock").innerHTML = clock;
+        
       }
       setInterval('writeClock()',500);
 
@@ -438,7 +519,7 @@
     <section id="stateSec">
       <div id="state"></div>
     </section>
-    <section id="clockSec">
+    <section id="clockSec" onclick="showTimeInput()">
       <div id="dateDiv"></div>
       <div id="clock"></div>
     </section>
@@ -476,8 +557,15 @@
     </div>
     <div id="richAlert"><div id="richAlertInner">
       <div id="richAlertText">Alert</div>
-      <input type="button" value="OK" onclick="hideRichAlert()" class="col3" id="richAlertOK"><br>
+      <input type="button" value="OK" onclick="hideRichAlert()" id="richAlertOK"><br>
     </div></div>
-   
+    
+    <div id="timeInput"><div id="timeInputInner">
+      <div id="timeInputContent">
+        <input type="date" id="dateInp" min="2019-01-01" onblur="setDateInRange()">
+        <input type="time" id="timeInp">
+      </div>
+      <input type="button" value="時刻指定" onclick="adaptInputtedTime()">
+    </div></div>
   </body>
 </html>
