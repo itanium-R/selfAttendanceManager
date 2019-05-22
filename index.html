@@ -122,9 +122,16 @@
         background-color: rgba(0,0,0,0.6);
         width: 100vw;
         height:100vh;
-        z-index: 8;
         text-align: center;
         align-items: center;
+      }      
+            
+      
+      #timeInput{;
+        z-index: 5;
+      }
+      #richAlert{
+        z-index: 9;
       }
       #richAlertInner,#timeInputInner{
         width :18.0em;   max-width: 95vw;
@@ -316,7 +323,7 @@
       }
       
       function initializeInput(){
-        let today = year + "-" + zeroPad2fig(month) + "-" + zeroPad2fig(day);
+        let today   = year + "-" + zeroPad2fig(month) + "-" + zeroPad2fig(day);
         document.getElementById("dateInp").max = today;
         document.getElementById("dateInp").value = today;
         document.getElementById("timeInp").value = hour+":"+min;
@@ -331,15 +338,20 @@
       
       function adaptInputtedTime(){
         let inputtedDate = document.getElementById("dateInp").value;
+        let inputtedTime =document.getElementById("timeInp").value;
+        if(!(inputtedDate&&inputtedTime)){ // 未入力があるとき
+          showRichAlert("未入力があります");
+          initializeInput();
+          return -1;
+        }
         yaer  = inputtedDate.slice(0,4);
         month = inputtedDate.slice(5,7);
         day   = inputtedDate.slice(8,10);
-        let inputtedTime =document.getElementById("timeInp").value;
         hour  = inputtedTime.slice(0,2);
         min   = inputtedTime.slice(3,5);
         
         date  =  year + "/" + month + "/" + day;
-        var clock =  "◆" + hour + ":" + min + "◆";
+        let clock =  "◆" + hour + ":" + min + "◆";
         
         document.getElementById("dateDiv").innerHTML = date;
         document.getElementById("clock").innerHTML = clock;
