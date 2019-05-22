@@ -431,8 +431,9 @@
           if(data== 0)/*正常*/;
           if(data==-1)showRichAlert("現在の状態でその操作はできません．");
           if(data==-2)showRichAlert("休憩回数が上限に達しました");
-          if(data==-3)showRichAlert("入力時間に誤りがあります");
-          if(data==-4)showRichAlert("入力時間に誤りがあります");
+          if(data==-3)showRichAlert("入力時刻が不正：前回休憩での入力時刻よりも前の時刻を申告しています");
+          if(data==-4)showRichAlert("入力時刻が不正：出勤時刻よりも前の時刻を申告しています");
+          if(data==-5)showRichAlert("入力時刻が不正：前回退勤時刻よりも前の時刻を申告しています");
           
           hideLoading();
           indicateState();

@@ -1,7 +1,7 @@
 // TODO : 勤務開始時間　休憩開始時間　経過時間の常時表示（html）
 // TODO : 出勤：前回の退勤時間と比較しエラーチェック
 // TODO : 直近3件のデータはWebAppから確認(余裕があれば修正も)可能に
-// TODO : try catchでエラー時return -5
+// TODO : try catchでエラー時return -9
 
 // 勤務情報訂正
 // return :  0 正常終了
@@ -20,12 +20,20 @@ function fixWorkInfo(place,descriptions){
 // 出勤
 // return :  0 正常終了
 //        : -1 異常終了：不正な状態遷移
+//        : -5 異常終了：出勤時刻が前回退勤時刻より前
 function goToWork(date,place,descriptions,hour,minute){
   var tcS=nameOpen("timeCard");
   var lastRow = tcS.getLastRow();
   var record  = tcS.getRange(lastRow,2,1,14).getValues();
+  // エラー処理
   if(getState(record,lastRow)!="off")return -1;
-  if(!date)date=getToday();
+  if(lastRow>2){
+    var lastLeave = new Date(Utilities.formatDate(record[0][0],'JST','yyyy/MM/dd') 
+                           + Utilities.formatDate(record[0][4],'JST',' HH:mm:ss'));
+    var input     = new Date(date+" "+hour+":"+minute);
+    if(lastLeave>input)return -5;
+  }
+  // レコード追加
   tcS.insertRowAfter(lastRow);
   lastRow+=1;
   tcS.getRange(1,2,1,14).copyTo(tcS.getRange(lastRow,2,1,14));
