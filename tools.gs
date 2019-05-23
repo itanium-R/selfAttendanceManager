@@ -55,7 +55,7 @@ function loadPreRecodeTable(attribute,record,state){
   if     (record[0][10])recessIndex=10
   else if(record[0][ 8])recessIndex= 8;
   
-  var table ="直近打刻情報<br><table><tr>";
+  var table ="<br><table><tr><td colspan='4'>直近打刻情報</td></tr><tr>";
   
   if(record[0][0])table+="<td>"+attribute[0][0]+"</td>";
   if(record[0][3])table+="<td>"+attribute[0][3]+"</td>";
