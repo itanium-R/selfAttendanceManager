@@ -17,10 +17,13 @@
         font-weight: bold; font-size:2rem;
         background : #EEE;
         color      : #000;
-        border     : 0.1em solid #EEE;
+        border     : 0em solid #EEE;
         border-radius: 0.5em;
       }
       input[type="button"]:active{
+      }      
+      input[type="button"]:disabled{
+        background : #999;
       }      
       label{
         display    : inline-block;
@@ -44,6 +47,15 @@
       }
       input[type="text"]:disabled{
         background-color:#EEE;
+      }
+      input[type="number"]{
+        border-width: 0 0 1px 0;
+        border-style:solid;
+        border-color: #666;
+        resize: none;
+        width: 5em;max-width: 35vw;
+        font-size: 1.2em;
+        text-align: center
       }
       input[type="date"]{
         display:inline-block;
@@ -116,6 +128,9 @@
         border: 0 none #fff;
         margin-bottom:1em;
         display:inline-block;
+        max-width:100%;
+        overflow-x: hidden; 
+        margin:0;
       }
       tr td{
         border: 0px solid #000;
@@ -300,6 +315,9 @@
       section#workInfoFixSec{
         display:none;
       }
+      section#editRecordSec{
+        display:none;
+      }
       
       /* --------------------------------------------------
       // OSS借用ここまで
@@ -310,10 +328,13 @@
     <script type="text/javascript"><!--
       var KINTAIAPP = KINTAIAPP || {}; // 名前空間
       
-      window.onload = function onload(){
+      window.onload = function(){
+        initialize();
+      }
+      
+      function initialize(){
         KINTAIAPP.isFixing = false;
         KINTAIAPP.isInputTimeAdopted = false;
-      
         indicateState();
         writeClock();
       }
@@ -365,6 +386,11 @@
         hideElemById("timeInput");
       }
       
+      function gotoFixWorkInfoTxt(){
+        if(document.getElementById("placeTxt").disabled==true){
+          fixWorkInfo();
+        }
+      }
       
       function indicateState(){
         showLoading();
@@ -393,27 +419,58 @@
           hideLoading();
         }
       }
-      function initializeToOff(){
-        document.getElementById("stateSec").style.backgroundColor="#EEEEEE";
-        showElemById("off"  ,"block");
+      
+      function hideMainElem(){
+        hideElemById("off"     );
         hideElemById("inWork"  );
         hideElemById("inRecess");
         hideElemById("fixWorkInfoSec");
+        hideElemById("editRecordSec");
+      }
+      function initializeToOff(){
+        document.getElementById("stateSec").style.backgroundColor="#EEEEEE";
+        hideMainElem();
+        showElemById("off"  ,"block");
         focusElemById("placeTxt");
       }
       function initializeToWork(){
         document.getElementById("stateSec").style.backgroundColor="#40e0d0";
-        hideElemById("off"     );
+        hideMainElem();
         showElemById("inWork","block");
-        hideElemById("inRecess");
-        hideElemById("fixWorkInfoSec");
       }
       function initializeToRecess(){
         document.getElementById("stateSec").style.backgroundColor="#98fb98";
-        hideElemById("off"   );
-        hideElemById("inWork");
+        hideMainElem();
         showElemById("inRecess","block");
-        hideElemById("fixWorkInfoSec");
+      }
+      function initializeToEditRecord(){
+        showLoading();
+        hideMainElem();
+        showElemById("editRecordSec","block");
+        
+        google.script.run.withSuccessHandler(gotFunc).sendToHtml_sheetOpenButton();
+        function gotFunc(data){
+          document.getElementById("sheetOpenButton").innerHTML=data;
+          hideLoading();
+        }
+        
+        document.getElementById("repYear" ).value=KINTAIAPP.year;
+        document.getElementById("repMonth").value=KINTAIAPP.month;
+        
+      }
+      
+      function builtMonthRep(){
+        showLoading();
+        
+        var repYear = document.getElementById("repYear" ).value;
+        var repMonth= document.getElementById("repMonth").value;
+        
+        google.script.run.withSuccessHandler(gotFunc).sendToHtml_pdfDlButton(repYear,repMonth);
+        function gotFunc(data){
+          document.getElementById("pdfDlButton").innerHTML=data;
+          hideLoading();
+        }
+        
       }
       
       function sendToGas(mode){
@@ -451,6 +508,7 @@
       }
       
       function fixWorkInfo(){
+          hideMainElem();
           KINTAIAPP.isFixing = true;
           document.getElementById("placeTxt").disabled   =false;
           document.getElementById("descriptTxt").disabled=false;
@@ -525,6 +583,7 @@
       function hideRichAlert(){
         document.getElementById("richAlert").style.display="none";
       }
+      
     // --></script>
 
 
@@ -538,15 +597,20 @@
     <section id="header">
       <div>セルフ勤怠くん</div>
     </section>
+    
     <section id="stateSec">
       <div id="state"></div>
     </section>
+    
     <section id="clockSec" onclick="showTimeInput()">
       <div id="dateDiv"></div>
       <div id="clock"></div>
     </section>
-    <section id="workInfoTxt">
-      <div id="preRecode"></div>
+    
+    <div id="preRecode"
+         onclick="if(!KINTAIAPP.isFixing)initializeToEditRecord();"></div>
+    
+    <section id="workInfoTxt" onclick="gotoFixWorkInfoTxt()">
       <label>場所</label>
       <input type="text" id="placeTxt" 
         onKeyDown="return focusElemByIdByEnter('descriptTxt')"
@@ -558,21 +622,31 @@
         onFocus="this.select(0,this.value.length)" onblur=""
          style="" placeholder="" wrap="off" ><br>
     </section>
+    
     <section id="off">
       <input type="button" id="goToWorkB" value="出勤" onclick="sendToGas(this.id)"><br>
     </section>
+    
     <section id="inWork">
       <input type="button" id="takeRecessB"  value="休憩開始" onclick="sendToGas(this.id)"><br>
-      <input type="button" value="作業内容修正" onclick="fixWorkInfo()"><br>
       <input type="button" id="leaveWorkB"   value="退勤" onclick="sendToGas(this.id)">
     </section>
+    
     <section id="inRecess">
       <input type="button" id="endRecessB" value="休憩終了" onclick="sendToGas(this.id)"><br>
-      <input type="button" value="作業内容修正" onclick="fixWorkInfo()"><br>
     </section>
 
     <section id="fixWorkInfoSec">
       <input type="button" id="fixB" value="修正" onclick="sendToGas(this.id)"><br>
+    </section>
+    
+    <section id="editRecordSec">
+      <div id="sheetOpenButton"></div>
+      <input type='number' id='repYear'>年
+      <input type='number' id='repMonth'>月<br>
+      <input type="button" value="月報作成" onclick="builtMonthRep()"><br>
+      <div id="pdfDlButton"></div>
+      <input type="button" value="戻る" onclick="initialize()"><br>
     </section>
     
     <div id="loader">

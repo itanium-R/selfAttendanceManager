@@ -1,4 +1,3 @@
-
 function getToday(){
   var now = new Date();
   now = Utilities.formatDate(now,'JST','yyyy/MM/dd');
@@ -52,20 +51,43 @@ function sendToHtml_state(){
 }
 
 function loadPreRecodeTable(attribute,record,state){
+  var recessIndex=6;
+  if     (record[0][10])recessIndex=10
+  else if(record[0][ 8])recessIndex= 8;
+  
   var table ="直近打刻情報<br><table><tr>";
+  
   if(record[0][0])table+="<td>"+attribute[0][0]+"</td>";
   if(record[0][3])table+="<td>"+attribute[0][3]+"</td>";
   if(record[0][4])table+="<td>"+attribute[0][4]+"</td>";
   if(record[0][5])table+="<td>"+attribute[0][5]+"</td>";
+  
+  if(state!="off"){
+    table +="<td>"+attribute[0][recessIndex  ]+"</td>";
+    table +="<td>"+attribute[0][recessIndex+1]+"</td>";
+  }
+  
   table += "</tr><tr>";
   if(record[0][0])table +="<td>"+Utilities.formatDate(record[0][0],'JST','MM/dd')+"</td>";
   if(record[0][3])table +="<td>"+Utilities.formatDate(record[0][3],'JST','HH:mm')+"</td>";
   if(record[0][4])table +="<td>"+Utilities.formatDate(record[0][4],'JST','HH:mm')+"</td>";
   if(record[0][5])table +="<td>"+Utilities.formatDate(record[0][5],'JST','HH:mm')+"</td>";
+  
+  if(state!="off"){
+    table +="<td>";
+    if(record[0][recessIndex  ])table +=Utilities.formatDate(record[0][recessIndex  ],'JST','HH:mm');
+    table +="</td><td>";
+    if(record[0][recessIndex+1])table +=Utilities.formatDate(record[0][recessIndex+1],'JST','HH:mm');
+    table +="</td>";
+  }
+  
   table += "</tr></table>"
   //Logger.log(table);
   return table;
 }
+
+
+
 //------------------------------------------------------------
 
 //アクティブスプレッドシートのnameシートを開く函数
