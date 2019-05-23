@@ -46,22 +46,22 @@
         background-color:#EEE;
       }
       input[type="date"]{
+        display:inline-block;
         font-family: 'Noto Sans JP';
         border:0;
         text-align: center;
         font-weight: bold; font-size:1.2em;
-        margin-left:2vw;
-        width: 10em;max-width: 78vw;
+        width: 90%; max-width: 15em;
         font-family: 'Noto Sans JP';
         background-color: #FFF;
       }
       input[type="time"]{
+        display:inline-block;
         font-family: 'Noto Sans JP';
         font-weight: bold; font-size:3em;
         border-width: 0;
         resize: none;
-        margin-left: 8vw;
-        width: 10em;max-width: 72vw;
+        width: 90%; max-width:15em;
         text-align: center;
         background-color: #FFF;
       }
@@ -110,6 +110,18 @@
       }
       section#workInfoTxt{
         margin-bottom:1rem;
+      }
+      
+      table{
+        border: 0 none #fff;
+        margin-bottom:1em;
+        display:inline-block;
+      }
+      tr td{
+        border: 0px solid #000;
+        background-color: #EEE;
+        text-align: center;
+        border-radius: 0.3em;
       }
 
        /* -------------------------------------------------- */
@@ -296,37 +308,31 @@
       
     --></style>
     <script type="text/javascript"><!--
-      var year;
-      var month;
-      var day;
-      var hour;
-      var min;
-      var sec;
-      var date;
-      var isFixing = false;
-      var isInputtedTimeAdopted = false;
-      
+      var KINTAIAPP = KINTAIAPP || {}; // 名前空間
       
       window.onload = function onload(){
+        KINTAIAPP.isFixing = false;
+        KINTAIAPP.isInputTimeAdopted = false;
+      
         indicateState();
         writeClock();
       }
       
       function showTimeInput(){
-        if(isInputtedTimeAdopted){
-          isInputtedTimeAdopted = false;
+        if(KINTAIAPP.isInputTimeAdopted){
+          KINTAIAPP.isInputTimeAdopted = false;
         }else{
-          isInputtedTimeAdopted=true;
+          KINTAIAPP.isInputTimeAdopted=true;
           initializeInput();
           showElemById("timeInput","flex");
         }
       }
       
       function initializeInput(){
-        let today   = year + "-" + zeroPad2fig(month) + "-" + zeroPad2fig(day);
+        let today   = KINTAIAPP.year + "-" + zeroPad2fig(KINTAIAPP.month) + "-" + zeroPad2fig(KINTAIAPP.day);
         document.getElementById("dateInp").max = today;
         document.getElementById("dateInp").value = today;
-        document.getElementById("timeInp").value = hour+":"+min;
+        document.getElementById("timeInp").value = KINTAIAPP.hour+":"+KINTAIAPP.min;
       }
       function setDateInRange(){
         let dateVal = document.getElementById("dateInp").value;
@@ -344,16 +350,16 @@
           initializeInput();
           return -1;
         }
-        yaer  = inputtedDate.slice(0,4);
-        month = inputtedDate.slice(5,7);
-        day   = inputtedDate.slice(8,10);
-        hour  = inputtedTime.slice(0,2);
-        min   = inputtedTime.slice(3,5);
+        KINTAIAPP.yaer  = inputtedDate.slice(0,4);
+        KINTAIAPP.month = inputtedDate.slice(5,7);
+        KINTAIAPP.day   = inputtedDate.slice(8,10);
+        KINTAIAPP.hour  = inputtedTime.slice(0,2);
+        KINTAIAPP.min   = inputtedTime.slice(3,5);
         
-        date  =  year + "/" + month + "/" + day;
-        let clock =  "◆" + hour + ":" + min + "◆";
+        KINTAIAPP.date  =  KINTAIAPP.year + "/" + KINTAIAPP.month + "/" + KINTAIAPP.day;
+        let clock =  "◆" + KINTAIAPP.hour + ":" + KINTAIAPP.min + "◆";
         
-        document.getElementById("dateDiv").innerHTML = date;
+        document.getElementById("dateDiv").innerHTML = KINTAIAPP.date;
         document.getElementById("clock").innerHTML = clock;
         
         hideElemById("timeInput");
@@ -368,8 +374,9 @@
         function loadState(data){
           let state = data[0];
           document.getElementById("state").innerHTML = state;
-          document.getElementById("placeTxt").value   =data[1];
-          document.getElementById("descriptTxt").value=data[2];
+          if(data[1])document.getElementById("placeTxt").value   =data[1];
+          if(data[2])document.getElementById("descriptTxt").value=data[2];
+          if(data[3])document.getElementById("preRecode").innerHTML=data[3];
           if(state=="未出勤"){
             initializeToOff();
           }
@@ -415,16 +422,18 @@
         var descript = document.getElementById("descriptTxt").value;
         
         if(      mode=="goToWorkB"){
-          google.script.run.withSuccessHandler(gotFunc).goToWork(date,place,descript,hour,min);
+          google.script.run.withSuccessHandler(gotFunc).goToWork(KINTAIAPP.date,place,descript,KINTAIAPP.hour,KINTAIAPP.min);
         }else if(mode=="takeRecessB"){
-          google.script.run.withSuccessHandler(gotFunc).takeRecess(date,hour,min);
+          google.script.run.withSuccessHandler(gotFunc).takeRecess(KINTAIAPP.date,KINTAIAPP.hour,KINTAIAPP.min);
         }else if(mode=="endRecessB"){
-          google.script.run.withSuccessHandler(gotFunc).endRecess(date,hour,min);
+          google.script.run.withSuccessHandler(gotFunc).endRecess(KINTAIAPP.date,KINTAIAPP.hour,KINTAIAPP.min);
         }else if(mode=="leaveWorkB"){
-          google.script.run.withSuccessHandler(gotFunc).leaveWork(date,hour,min);
+          google.script.run.withSuccessHandler(gotFunc).leaveWork(KINTAIAPP.date,KINTAIAPP.hour,KINTAIAPP.min);
         }else if(mode=="fixB"){
           google.script.run.withSuccessHandler(gotFunc).fixWorkInfo(place,descript);
-          isFixing = false;
+          KINTAIAPP.isFixing = false;
+        }else{
+          return -1;
         }
         
         function gotFunc(data){
@@ -437,12 +446,12 @@
           
           hideLoading();
           indicateState();
-          isInputtedTimeAdopted = false;
+          KINTAIAPP.isInputTimeAdopted = false;
         }
       }
       
       function fixWorkInfo(){
-          isFixing = true;
+          KINTAIAPP.isFixing = true;
           document.getElementById("placeTxt").disabled   =false;
           document.getElementById("descriptTxt").disabled=false;
           hideElemById("off"     );
@@ -466,7 +475,7 @@
       
       function runSendScriptByEnter(){
         if(window.event.keyCode==13){
-          if(isFixing){
+          if(KINTAIAPP.isFixing){
             sendToGas("fixB");
           }else{
             sendToGas("goToWorkB");
@@ -483,21 +492,21 @@
         return ("00"+parseInt(num)).slice(-2);
       }
       function writeClock() {
-        if(isInputtedTimeAdopted)return -1;
+        if(KINTAIAPP.isInputTimeAdopted)return -1;
         var now = new Date();
         
-        hour = zeroPad2fig( now.getHours()  );  //Time.getHours()
-        min =  zeroPad2fig( now.getMinutes() ); //Time.getMinutes()
-        sec =  zeroPad2fig( now.getSeconds() );
+        KINTAIAPP.hour = zeroPad2fig( now.getHours()  );  //Time.getHours()
+        KINTAIAPP.min =  zeroPad2fig( now.getMinutes() ); //Time.getMinutes()
+        KINTAIAPP.sec =  zeroPad2fig( now.getSeconds() );
         
-        year = now.getFullYear();
-        month= zeroPad2fig(now.getMonth() +1);
-        day  = zeroPad2fig( now.getDate() );
+        KINTAIAPP.year = now.getFullYear();
+        KINTAIAPP.month= zeroPad2fig(now.getMonth() +1);
+        KINTAIAPP.day  = zeroPad2fig( now.getDate() );
         
-        date  =  year + "/" + month + "/" + day;
-        var clock =  hour + ":" + min + ":" + sec;
+        KINTAIAPP.date  =  KINTAIAPP.year + "/" + KINTAIAPP.month + "/" + KINTAIAPP.day;
+        var clock =  KINTAIAPP.hour + ":" + KINTAIAPP.min + ":" + KINTAIAPP.sec;
         
-        document.getElementById("dateDiv").innerHTML = date;
+        document.getElementById("dateDiv").innerHTML = KINTAIAPP.date;
         document.getElementById("clock").innerHTML = clock;
         
       }
@@ -511,7 +520,7 @@
         hideRichAlert();
         document.getElementById("richAlert").style.display="flex";
         document.getElementById("richAlertText").innerHTML=str;
-        document.getElementById("richAlertOK").focus();
+        document.getElementById("richAlertClose").focus();
       }
       function hideRichAlert(){
         document.getElementById("richAlert").style.display="none";
@@ -537,6 +546,7 @@
       <div id="clock"></div>
     </section>
     <section id="workInfoTxt">
+      <div id="preRecode"></div>
       <label>場所</label>
       <input type="text" id="placeTxt" 
         onKeyDown="return focusElemByIdByEnter('descriptTxt')"
@@ -570,7 +580,7 @@
     </div>
     <div id="richAlert"><div id="richAlertInner">
       <div id="richAlertText">Alert</div>
-      <input type="button" value="OK" onclick="hideRichAlert()" id="richAlertOK"><br>
+      <input type="button" value="閉じる" onclick="hideRichAlert()" id="richAlertClose"><br>
     </div></div>
     
     <div id="timeInput"><div id="timeInputInner">

@@ -34,19 +34,37 @@ function sendToHtml_state(){
   var tcS     = nameOpen("timeCard");
   var lastRow = tcS.getLastRow();
   var record  = tcS.getRange(lastRow,2,1,14).getValues();
+  var attribute = tcS.getRange(    2,2,1,14).getValues();
   
   // 状態確認
   var state =getState(record,lastRow);
-  var result = Array(3);
+  var result = Array(4);
   if(state=="inWork")  result[0] = "勤務中";
   if(state=="inRecess")result[0] = "休憩中";
   if(state=="off")     result[0] = "未出勤";
   if(lastRow>2){
     result[1]=record[0][1];
     result[2]=record[0][2];
+    result[3]=loadPreRecodeTable(attribute,record,state);
   }
   Logger.log(result);
   return result;
+}
+
+function loadPreRecodeTable(attribute,record,state){
+  var table ="直近打刻情報<br><table><tr>";
+  if(record[0][0])table+="<td>"+attribute[0][0]+"</td>";
+  if(record[0][3])table+="<td>"+attribute[0][3]+"</td>";
+  if(record[0][4])table+="<td>"+attribute[0][4]+"</td>";
+  if(record[0][5])table+="<td>"+attribute[0][5]+"</td>";
+  table += "</tr><tr>";
+  if(record[0][0])table +="<td>"+Utilities.formatDate(record[0][0],'JST','MM/dd')+"</td>";
+  if(record[0][3])table +="<td>"+Utilities.formatDate(record[0][3],'JST','HH:mm')+"</td>";
+  if(record[0][4])table +="<td>"+Utilities.formatDate(record[0][4],'JST','HH:mm')+"</td>";
+  if(record[0][5])table +="<td>"+Utilities.formatDate(record[0][5],'JST','HH:mm')+"</td>";
+  table += "</tr></table>"
+  //Logger.log(table);
+  return table;
 }
 //------------------------------------------------------------
 
