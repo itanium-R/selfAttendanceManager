@@ -1,0 +1,322 @@
+<style><!--
+    
+      @import url(http://fonts.googleapis.com/earlyaccess/notosansjp.css);
+      /*@import url('https://fonts.googleapis.com/css?family=Teko&display=swap');
+        @import url('https://fonts.googleapis.com/css?family=Electrolize&display=swap');*/
+
+      input[type="button"]{
+        display    : inline-block;
+        height     : 3.5rem;
+        width      :  10em;  max-width   : 90vw;
+        padding    : 0.1rem; max-padding : 2vw;
+        margin     : 3px;   max-margin  : 2vw;
+        font-weight: bold; font-size:2rem;
+        background : #EEE;
+        color      : #000;
+        border     : 0em solid #EEE;
+        border-radius: 0.5em;
+      }
+      input[type="button"]:active{
+      }      
+      input[type="button"]:disabled{
+        background : #999;
+      }      
+      label{
+        display    : inline-block;
+        width: 5em; max-width:25vw;
+      }
+      input[type="text"]{
+        border-width: 0 0 1px 0;
+        border-style:solid;
+        border-color: #666;
+        resize: none;
+        width: 12em;max-width: 60vw;
+        font-size: 1.2em;
+        text-align: center
+      }
+      input[type="text"]:focus{
+        outline: 1px #EEE double;
+        border-width:0 0 1px 0;
+        border-bottom-style:solid;
+        border-color: #000;
+        resize: none;
+      }
+      input[type="text"]:disabled{
+        background-color:#EEE;
+      }
+      input[type="number"]{
+        border-width: 0 0 1px 0;
+        border-style:solid;
+        border-color: #666;
+        resize: none;
+        width: 5em;max-width: 35vw;
+        font-size: 1.2em;
+        text-align: center
+      }
+      input[type="date"]{
+        display:inline-block;
+        font-family: 'Noto Sans JP';
+        border:0;
+        text-align: center;
+        font-weight: bold; font-size:1.2em;
+        width: 90%; max-width: 15em;
+        font-family: 'Noto Sans JP';
+        background-color: #FFF;
+      }
+      input[type="time"]{
+        display:inline-block;
+        font-family: 'Noto Sans JP';
+        font-weight: bold; font-size:3em;
+        border-width: 0;
+        resize: none;
+        width: 90%; max-width:15em;
+        text-align: center;
+        background-color: #FFF;
+      }
+
+      font.correct{
+        color:red;
+      }
+      font.incorrect{
+        color:blue;
+      }
+      body{
+        margin:0;padding:0;
+        font-weight: bold; font-size:1.2em;
+        font-family: 'Noto Sans JP';
+      }
+      div{
+        margin:auto;
+        width:24em;
+        max-width:99vw;
+        text-align:center;
+      }
+      section{
+        margin:0;
+        width:100vw;
+        text-align:center;
+      }
+      hr{
+        margin:auto;
+        width:24em;
+        max-width:99vw;
+      }
+      section#header{
+        background-color:#EEE;
+      }
+      section#stateSec{
+        background-color:#EEE;
+        min-height:2rem;
+        font-size:2rem;
+      }
+      section#buttons{
+        min-height:12em;
+      }
+      div#clock{
+        font-size:3em;
+        border:0;
+      }
+      section#workInfoTxt{
+        margin-bottom:1rem;
+      }
+      
+      table{
+        border: 0 none #fff;
+        display:inline-block;
+        max-width:100%;
+        overflow-x: hidden; 
+        margin:0 0 0.5em 0;
+      }
+      tr td{
+        border: 0px solid #000;
+        background-color: #EEE;
+        text-align: center;
+        border-radius: 0.3em;
+      }
+
+       /* -------------------------------------------------- */
+      
+      
+      #richAlert,#timeInput{
+        position:fixed;
+        display: none;
+        top:0; bottom:0; right:0; left:0;
+        background-color: rgba(0,0,0,0.6);
+        width: 100vw;
+        height:100vh;
+        text-align: center;
+        align-items: center;
+      }      
+            
+      
+      #timeInput{;
+        z-index: 5;
+      }
+      #richAlert{
+        z-index: 9;
+      }
+      #richAlertInner,#timeInputInner{
+        width :18.0em;   max-width: 95vw;
+        height:15.0em;   max-height:80vh;
+        border: 0em none #FFF;
+        background-color: #FFF;
+        justify-content: center;
+        text-align: center;
+        font-weight: 900;
+        font-size:1em;
+        border-radius: 0.3em;
+      }
+      #richAlertText{
+        margin-top:0.5em;
+        width :17.0em;   max-width :90vw;
+        height:10.0em;   max-height:50vh;
+        margin:0.5em 0.5em 0 0.5em ;
+        margin-buttom:0.5em;
+        overflow-y:scroll;
+      }
+      #timeInputContent{
+        display: table-cell; 
+        vertical-align: middle;
+        margin-top:0.5em;
+        width :17.0em;   max-width :90vw;
+        height:10.0em;   max-height:50vh;
+        margin:0.5em 0.5em 0 0.5em ;
+        margin-buttom:0.5em;
+        overflow:hidden;
+      }
+      /* animation: fadeOut 2.0s 1 ease .5s forwards; */
+      @keyframes fadeOutAlert {
+        0% {
+          opacity:1.0;
+        }
+        50% {
+          opacity:1.0;
+        }
+        99% {
+          opacity:0.0;
+          z-index: 9;
+        }
+        100%{
+          z-index: -9;
+        }
+      }
+      
+      #loader{
+        position:fixed;
+        display: none;
+        top:0; bottom:0; right:0; left:0;
+        background-color: black;
+        width: 100vw;
+        height:100vh;
+        z-index: 7;
+        text-align: center;
+        align-items: center;
+        opacity: 0.6;
+      }
+      /* --------------------------------------------------
+      // これより下 OSS借用 [MIT License]
+      // css-loaders Copyright (c) 2014 Luke Haas
+      // https://github.com/lukehaas/css-loaders
+      // --------------------------------------------------　*/
+      .loaderInner {
+        color: #FFF;
+        font-size: 50px;
+        text-indent: -9999em;
+        overflow: hidden;
+        width: 1em;
+        height: 1em;
+        border-radius: 50%;
+        margin: 72px auto;
+        position: relative;
+        -webkit-transform: translateZ(0);
+        -ms-transform: translateZ(0);
+        transform: translateZ(0);
+        -webkit-animation: load6 1.7s infinite ease, round 1.7s infinite ease;
+        animation: load6 1.7s infinite ease, round 1.7s infinite ease;
+      }
+      @-webkit-keyframes load6 {
+        0% {
+          box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+        }
+        5%,
+        95% {
+          box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+        }
+        10%,
+        59% {
+          box-shadow: 0 -0.83em 0 -0.4em, -0.087em -0.825em 0 -0.42em, -0.173em -0.812em 0 -0.44em, -0.256em -0.789em 0 -0.46em, -0.297em -0.775em 0 -0.477em;
+        }
+        20% {
+          box-shadow: 0 -0.83em 0 -0.4em, -0.338em -0.758em 0 -0.42em, -0.555em -0.617em 0 -0.44em, -0.671em -0.488em 0 -0.46em, -0.749em -0.34em 0 -0.477em;
+        }
+        38% {
+          box-shadow: 0 -0.83em 0 -0.4em, -0.377em -0.74em 0 -0.42em, -0.645em -0.522em 0 -0.44em, -0.775em -0.297em 0 -0.46em, -0.82em -0.09em 0 -0.477em;
+        }
+        100% {
+          box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+        }
+      }
+      @keyframes load6 {
+        0% {
+          box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+        }
+        5%,
+        95% {
+        box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+        }
+        10%,
+        59% {
+        box-shadow: 0 -0.83em 0 -0.4em, -0.087em -0.825em 0 -0.42em, -0.173em -0.812em 0 -0.44em, -0.256em -0.789em 0 -0.46em, -0.297em -0.775em 0 -0.477em;
+        }
+        20% {
+        box-shadow: 0 -0.83em 0 -0.4em, -0.338em -0.758em 0 -0.42em, -0.555em -0.617em 0 -0.44em, -0.671em -0.488em 0 -0.46em, -0.749em -0.34em 0 -0.477em;
+        }
+        38% {
+        box-shadow: 0 -0.83em 0 -0.4em, -0.377em -0.74em 0 -0.42em, -0.645em -0.522em 0 -0.44em, -0.775em -0.297em 0 -0.46em, -0.82em -0.09em 0 -0.477em;
+        }
+        100% {
+        box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+        }
+      }
+      @-webkit-keyframes round {
+        0% {
+          -webkit-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+        100% {
+          -webkit-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes round {
+        0% {
+          -webkit-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+        100% {
+          -webkit-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+      section#off{
+        display:none;
+      }
+      section#inWork{
+        display:none;
+      }
+      section#inRecess{
+        display:none;
+      }
+      section#workInfoFixSec{
+        display:none;
+      }
+      section#editRecordSec{
+        display:none;
+      }
+      
+      /* --------------------------------------------------
+      // OSS借用ここまで
+      // css-loaders Copyright (c) 2014 Luke Haas
+      // --------------------------------------------------*/
+      
+    --></style>
