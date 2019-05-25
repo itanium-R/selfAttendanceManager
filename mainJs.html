@@ -8,6 +8,8 @@
       function initialize(){
         KINTAIAPP.isFixing = false;
         KINTAIAPP.isInputTimeAdopted = false;
+        KINTAIAPP.updateClock = setInterval('writeClock()',500);
+          showElemById("workInfoTxt","block");
         indicateState();
         writeClock();
       }
@@ -15,8 +17,9 @@
       function showTimeInput(){
         if(KINTAIAPP.isInputTimeAdopted){
           KINTAIAPP.isInputTimeAdopted = false;
+          KINTAIAPP.updateClock = setInterval('writeClock()',500);
         }else{
-          KINTAIAPP.isInputTimeAdopted=true;
+          KINTAIAPP.isInputTimeAdopted = true;
           initializeInput();
           showElemById("timeInput","flex");
         }
@@ -98,7 +101,7 @@
         hideElemById("inWork"  );
         hideElemById("inRecess");
         hideElemById("fixWorkInfoSec");
-        hideElemById("editRecordSec");
+        hideElemById("sheetLinkSec");
       }
       function initializeToOff(){
         document.getElementById("stateSec").style.backgroundColor="#EEEEEE";
@@ -116,10 +119,10 @@
         hideMainElem();
         showElemById("inRecess","block");
       }
-      function initializeToEditRecord(){
+      function initializeToSheetLink(){
         showLoading();
         hideMainElem();
-        showElemById("editRecordSec","block");
+        showElemById("sheetLinkSec","block");
         
         google.script.run.withSuccessHandler(gotFunc).sendToHtml_sheetOpenButton();
         function gotFunc(data){
@@ -127,6 +130,12 @@
           hideLoading();
         }
         
+        hideElemById("workInfoTxt");
+        clearInterval(KINTAIAPP.updateClock);
+        document.getElementById("dateDiv").innerHTML = "";
+        document.getElementById("clock").innerHTML = "";
+        document.getElementById("preRecode").innerHTML = "";
+        document.getElementById("state").innerHTML = "打刻情報";
         document.getElementById("repYear" ).value=KINTAIAPP.year;
         document.getElementById("repMonth").value=KINTAIAPP.month;
         
@@ -223,11 +232,14 @@
         return ("00"+parseInt(num)).slice(-2);
       }
       function writeClock() {
-        if(KINTAIAPP.isInputTimeAdopted)return -1;
+        if(KINTAIAPP.isInputTimeAdopted){
+          clearInterval(KINTAIAPP.updateClock);
+          return -1;
+        }
         var now = new Date();
         
-        KINTAIAPP.hour = zeroPad2fig( now.getHours()  );  //Time.getHours()
-        KINTAIAPP.min =  zeroPad2fig( now.getMinutes() ); //Time.getMinutes()
+        KINTAIAPP.hour = zeroPad2fig( now.getHours()  );  
+        KINTAIAPP.min =  zeroPad2fig( now.getMinutes() ); 
         KINTAIAPP.sec =  zeroPad2fig( now.getSeconds() );
         
         KINTAIAPP.year = now.getFullYear();
@@ -241,7 +253,6 @@
         document.getElementById("clock").innerHTML = clock;
         
       }
-      setInterval('writeClock()',500);
 
 
       function showLoading(){document.getElementById("loader").style.display="flex";}

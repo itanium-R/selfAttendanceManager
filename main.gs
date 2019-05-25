@@ -181,3 +181,70 @@ function isTimeApropos(record,hour,minute){
   if(isLater(hour,minute,startWorkHour,startWorkMin)==1)return -4;
   return recessIndex;
 }
+
+// 現在の状態など主要情報をHTMLに送る
+// return : result[0] 状態
+//        : result[1] 場所
+//        : result[2] 作業内容
+//        : result[3] 直近打刻情報
+function sendToHtml_state(){
+  var tcS     = nameOpen("timeCard");
+  var lastRow = tcS.getLastRow();
+  var record  = tcS.getRange(lastRow,2,1,14).getValues();
+  var attribute = tcS.getRange(    2,2,1,14).getValues();
+  
+  // 状態確認
+  var state =getState(record,lastRow);
+  var result = Array(4);
+  if(state=="inWork")  result[0] = "勤務中";
+  if(state=="inRecess")result[0] = "休憩中";
+  if(state=="off")     result[0] = "未出勤";
+  if(lastRow>2){
+    result[1]=record[0][1];
+    result[2]=record[0][2];
+    result[3]=loadPreRecodeTable(attribute,record,state);
+  }
+  Logger.log(result);
+  return result;
+}
+
+
+// arg    : attribute レコードの属性情報
+//        : record    対象レコード
+//        : state     現在の状態
+// return : 直近打刻情報を格納したtableのhtml
+function loadPreRecodeTable(attribute,record,state){
+  var recessIndex=6;
+  if     (record[0][10])recessIndex=10
+  else if(record[0][ 8])recessIndex= 8;
+  
+  var table ="<table><tr><td colspan='4'>直近打刻情報</td></tr><tr>";
+  
+  if(record[0][0])table+="<td>"+attribute[0][0]+"</td>";
+  if(record[0][3])table+="<td>"+attribute[0][3]+"</td>";
+  if(record[0][4])table+="<td>"+attribute[0][4]+"</td>";
+  if(record[0][5])table+="<td>"+attribute[0][5]+"</td>";
+  
+  if(state!="off"){
+    table +="<td>"+attribute[0][recessIndex  ]+"</td>";
+    table +="<td>"+attribute[0][recessIndex+1]+"</td>";
+  }
+  
+  table += "</tr><tr>";
+  if(record[0][0])table +="<td>"+Utilities.formatDate(record[0][0],'JST','MM/dd')+"</td>";
+  if(record[0][3])table +="<td>"+Utilities.formatDate(record[0][3],'JST','HH:mm')+"</td>";
+  if(record[0][4])table +="<td>"+Utilities.formatDate(record[0][4],'JST','HH:mm')+"</td>";
+  if(record[0][5])table +="<td>"+Utilities.formatDate(record[0][5],'JST','HH:mm')+"</td>";
+  
+  if(state!="off"){
+    table +="<td>";
+    if(record[0][recessIndex  ])table +=Utilities.formatDate(record[0][recessIndex  ],'JST','HH:mm');
+    table +="</td><td>";
+    if(record[0][recessIndex+1])table +=Utilities.formatDate(record[0][recessIndex+1],'JST','HH:mm');
+    table +="</td>";
+  }
+  
+  table += "</tr></table>"
+  //Logger.log(table);
+  return table;
+}
