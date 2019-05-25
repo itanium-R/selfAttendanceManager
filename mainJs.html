@@ -1,35 +1,35 @@
 <script type="text/javascript"><!--
-      var KINTAIAPP = KINTAIAPP || {}; // 名前空間
+      var VARS = VARS || {};
       
       window.onload = function(){
         initialize();
       }
       
       function initialize(){
-        KINTAIAPP.isFixing = false;
-        KINTAIAPP.isInputTimeAdopted = false;
-        KINTAIAPP.updateClock = setInterval('writeClock()',500);
+        VARS.isFixing = false;
+        VARS.isInputTimeAdopted = false;
+        VARS.updateClock = setInterval('writeClock()',500);
           showElemById("workInfoTxt","block");
         indicateState();
         writeClock();
       }
       
       function showTimeInput(){
-        if(KINTAIAPP.isInputTimeAdopted){
-          KINTAIAPP.isInputTimeAdopted = false;
-          KINTAIAPP.updateClock = setInterval('writeClock()',500);
+        if(VARS.isInputTimeAdopted){
+          VARS.isInputTimeAdopted = false;
+          VARS.updateClock = setInterval('writeClock()',500);
         }else{
-          KINTAIAPP.isInputTimeAdopted = true;
+          VARS.isInputTimeAdopted = true;
           initializeInput();
           showElemById("timeInput","flex");
         }
       }
       
       function initializeInput(){
-        let today   = KINTAIAPP.year + "-" + zeroPad2fig(KINTAIAPP.month) + "-" + zeroPad2fig(KINTAIAPP.day);
+        let today   = VARS.year + "-" + zeroPad2fig(VARS.month) + "-" + zeroPad2fig(VARS.day);
         document.getElementById("dateInp").max = today;
         document.getElementById("dateInp").value = today;
-        document.getElementById("timeInp").value = KINTAIAPP.hour+":"+KINTAIAPP.min;
+        document.getElementById("timeInp").value = VARS.hour+":"+VARS.min;
       }
       function setDateInRange(){
         let dateVal = document.getElementById("dateInp").value;
@@ -47,16 +47,16 @@
           initializeInput();
           return -1;
         }
-        KINTAIAPP.yaer  = inputtedDate.slice(0,4);
-        KINTAIAPP.month = inputtedDate.slice(5,7);
-        KINTAIAPP.day   = inputtedDate.slice(8,10);
-        KINTAIAPP.hour  = inputtedTime.slice(0,2);
-        KINTAIAPP.min   = inputtedTime.slice(3,5);
+        VARS.yaer  = inputtedDate.slice(0,4);
+        VARS.month = inputtedDate.slice(5,7);
+        VARS.day   = inputtedDate.slice(8,10);
+        VARS.hour  = inputtedTime.slice(0,2);
+        VARS.min   = inputtedTime.slice(3,5);
         
-        KINTAIAPP.date  =  KINTAIAPP.year + "/" + KINTAIAPP.month + "/" + KINTAIAPP.day;
-        let clock =  "◆" + KINTAIAPP.hour + ":" + KINTAIAPP.min + "◆";
+        VARS.date  =  VARS.year + "/" + VARS.month + "/" + VARS.day;
+        let clock =  "◆" + VARS.hour + ":" + VARS.min + "◆";
         
-        document.getElementById("dateDiv").innerHTML = KINTAIAPP.date;
+        document.getElementById("dateDiv").innerHTML = VARS.date;
         document.getElementById("clock").innerHTML = clock;
         
         hideElemById("timeInput");
@@ -131,13 +131,13 @@
         }
         
         hideElemById("workInfoTxt");
-        clearInterval(KINTAIAPP.updateClock);
+        clearInterval(VARS.updateClock);
         document.getElementById("dateDiv").innerHTML = "";
         document.getElementById("clock").innerHTML = "";
         document.getElementById("preRecode").innerHTML = "";
         document.getElementById("state").innerHTML = "打刻情報";
-        document.getElementById("repYear" ).value=KINTAIAPP.year;
-        document.getElementById("repMonth").value=KINTAIAPP.month;
+        document.getElementById("repYear" ).value=VARS.year;
+        document.getElementById("repMonth").value=VARS.month;
         
       }
       
@@ -161,16 +161,16 @@
         var descript = document.getElementById("descriptTxt").value;
         
         if(      mode=="goToWorkB"){
-          google.script.run.withSuccessHandler(gotFunc).goToWork(KINTAIAPP.date,place,descript,KINTAIAPP.hour,KINTAIAPP.min);
+          google.script.run.withSuccessHandler(gotFunc).goToWork(VARS.date,place,descript,VARS.hour,VARS.min);
         }else if(mode=="takeRecessB"){
-          google.script.run.withSuccessHandler(gotFunc).takeRecess(KINTAIAPP.date,KINTAIAPP.hour,KINTAIAPP.min);
+          google.script.run.withSuccessHandler(gotFunc).takeRecess(VARS.date,VARS.hour,VARS.min);
         }else if(mode=="endRecessB"){
-          google.script.run.withSuccessHandler(gotFunc).endRecess(KINTAIAPP.date,KINTAIAPP.hour,KINTAIAPP.min);
+          google.script.run.withSuccessHandler(gotFunc).endRecess(VARS.date,VARS.hour,VARS.min);
         }else if(mode=="leaveWorkB"){
-          google.script.run.withSuccessHandler(gotFunc).leaveWork(KINTAIAPP.date,KINTAIAPP.hour,KINTAIAPP.min);
+          google.script.run.withSuccessHandler(gotFunc).leaveWork(VARS.date,VARS.hour,VARS.min);
         }else if(mode=="fixB"){
           google.script.run.withSuccessHandler(gotFunc).fixWorkInfo(place,descript);
-          KINTAIAPP.isFixing = false;
+          VARS.isFixing = false;
         }else{
           return -1;
         }
@@ -185,13 +185,13 @@
           
           hideLoading();
           indicateState();
-          KINTAIAPP.isInputTimeAdopted = false;
+          VARS.isInputTimeAdopted = false;
         }
       }
       
       function fixWorkInfo(){
           hideMainElem();
-          KINTAIAPP.isFixing = true;
+          VARS.isFixing = true;
           document.getElementById("placeTxt").disabled   =false;
           document.getElementById("descriptTxt").disabled=false;
           hideElemById("off"     );
@@ -215,7 +215,7 @@
       
       function runSendScriptByEnter(){
         if(window.event.keyCode==13){
-          if(KINTAIAPP.isFixing){
+          if(VARS.isFixing){
             sendToGas("fixB");
           }else{
             sendToGas("goToWorkB");
@@ -225,36 +225,35 @@
         return true;
       }
       
-      function hideElemById(id)        {document.getElementById(id).style.display="none";}  
-      function showElemById(id,display){document.getElementById(id).style.display=display;} 
-      
       function zeroPad2fig(num) {
         return ("00"+parseInt(num)).slice(-2);
       }
       function writeClock() {
-        if(KINTAIAPP.isInputTimeAdopted){
-          clearInterval(KINTAIAPP.updateClock);
+        if(VARS.isInputTimeAdopted){
+          clearInterval(VARS.updateClock);
           return -1;
         }
         var now = new Date();
         
-        KINTAIAPP.hour = zeroPad2fig( now.getHours()  );  
-        KINTAIAPP.min =  zeroPad2fig( now.getMinutes() ); 
-        KINTAIAPP.sec =  zeroPad2fig( now.getSeconds() );
+        VARS.hour = zeroPad2fig( now.getHours()  );  
+        VARS.min =  zeroPad2fig( now.getMinutes() ); 
+        VARS.sec =  zeroPad2fig( now.getSeconds() );
         
-        KINTAIAPP.year = now.getFullYear();
-        KINTAIAPP.month= zeroPad2fig(now.getMonth() +1);
-        KINTAIAPP.day  = zeroPad2fig( now.getDate() );
+        VARS.year = now.getFullYear();
+        VARS.month= zeroPad2fig(now.getMonth() +1);
+        VARS.day  = zeroPad2fig( now.getDate() );
         
-        KINTAIAPP.date  =  KINTAIAPP.year + "/" + KINTAIAPP.month + "/" + KINTAIAPP.day;
-        var clock =  KINTAIAPP.hour + ":" + KINTAIAPP.min + ":" + KINTAIAPP.sec;
+        VARS.date  =  VARS.year + "/" + VARS.month + "/" + VARS.day;
+        var clock =  VARS.hour + ":" + VARS.min + ":" + VARS.sec;
         
-        document.getElementById("dateDiv").innerHTML = KINTAIAPP.date;
+        document.getElementById("dateDiv").innerHTML = VARS.date;
         document.getElementById("clock").innerHTML = clock;
         
       }
-
-
+      
+      function showElemById(id,display){document.getElementById(id).style.display=display;} 
+      function hideElemById(id)        {document.getElementById(id).style.display="none";}  
+      
       function showLoading(){document.getElementById("loader").style.display="flex";}
       function hideLoading(){document.getElementById("loader").style.display="none";}
       
