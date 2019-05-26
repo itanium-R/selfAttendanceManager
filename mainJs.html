@@ -9,7 +9,7 @@
         VARS.isFixing = false;
         VARS.isInputTimeAdopted = false;
         VARS.updateClock = setInterval('writeClock()',500);
-          showElemById("workInfoTxt","block");
+        showElemById("workInfoTxt","block");
         indicateState();
         writeClock();
       }
@@ -186,6 +186,7 @@
           hideLoading();
           indicateState();
           VARS.isInputTimeAdopted = false;
+          VARS.updateClock = setInterval('writeClock()',500);
         }
       }
       
