@@ -15,11 +15,10 @@
       }
       
       function showTimeInput(){
-        if(VARS.isInputTimeAdopted){
+        if(VARS.isInputTimeAdopted){ // 入力時刻表示中ならリアルタイム表示に切り替え
           VARS.isInputTimeAdopted = false;
           VARS.updateClock = setInterval('writeClock()',500);
-        }else{
-          VARS.isInputTimeAdopted = true;
+        }else{                       // リアルタイム表示中なら時刻入力画面を表示
           initializeInput();
           showElemById("timeInput","flex");
         }
@@ -47,6 +46,7 @@
           initializeInput();
           return -1;
         }
+                  
         VARS.yaer  = inputtedDate.slice(0,4);
         VARS.month = inputtedDate.slice(5,7);
         VARS.day   = inputtedDate.slice(8,10);
@@ -58,6 +58,7 @@
         
         document.getElementById("dateDiv").innerHTML = VARS.date;
         document.getElementById("clock").innerHTML = clock;
+        VARS.isInputTimeAdopted = true;
         
         hideElemById("timeInput");
       }

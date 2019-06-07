@@ -22,8 +22,7 @@
       <div id="clock"></div>
     </section>
     
-    <div id="preRecode"
-         onclick="if(!VARS.isFixing)initializeToSheetLink();"></div>
+    <div id="preRecode"></div>
     
     <section id="workInfoTxt" onclick="gotoFixWorkInfoTxt()">
       <label>場所</label>
@@ -72,7 +71,8 @@
       <input type="button" value="閉じる" onclick="hideRichAlert()" id="richAlertClose"><br>
     </div></div>
     
-    <div id="timeInput"><div id="timeInputInner">
+    <div id="timeInput"      onclick="hideElemById('timeInput')">
+    <div id="timeInputInner" onclick="event.stopPropagation()">
       <div id="timeInputContent">
         <input type="date" id="dateInp" min="2019-01-01" onblur="setDateInRange()">
         <input type="time" id="timeInp">

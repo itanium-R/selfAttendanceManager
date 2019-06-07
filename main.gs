@@ -1,6 +1,7 @@
 // 勤務情報訂正
-// return :  0 正常終了
-//        : -1 異常終了：不正な状態遷移
+// @param  :   place:場所  descriptions:作業内容
+// @return :  0 正常終了
+//         : -1 異常終了：不正な状態遷移
 function fixWorkInfo(place,descriptions){
   var tcS=nameOpen("timeCard");
   var lastRow = tcS.getLastRow();
@@ -12,10 +13,12 @@ function fixWorkInfo(place,descriptions){
   return 0;
 }
 
-// 出勤
-// return :  0 正常終了
-//        : -1 異常終了：不正な状態遷移
-//        : -5 異常終了：出勤時刻が前回退勤時刻より前
+// 出勤登録
+// @paran  :   date:日付   hour:時   minute:分
+//         :   place:場所  descriptions:作業内容
+// @return :  0 正常終了
+//         : -1 異常終了：不正な状態遷移
+//         : -5 異常終了：出勤時刻が前回退勤時刻より前
 function goToWork(date,place,descriptions,hour,minute){
   var tcS=nameOpen("timeCard");
   var lastRow = tcS.getLastRow();
@@ -47,12 +50,13 @@ function test(){
   //Logger.log(findDiffOfDate("2019/5/20","2019-05-21"));
 }
 
-// 休憩開始
-// return :  0 正常終了
-//        : -1 異常終了：不正な状態遷移
-//        : -2 異常終了：休憩回数上限超過
-//        : -3 異常終了：入力時間が前回休憩より前
-//        : -4 異常終了：入力時間が勤務開始より前
+// 休憩開始登録
+// @paran  :   date:日付   hour:時   minute:分
+// @return :  0 正常終了
+//         : -1 異常終了：不正な状態遷移
+//         : -2 異常終了：休憩回数上限超過
+//         : -3 異常終了：入力時間が前回休憩より前
+//         : -4 異常終了：入力時間が勤務開始より前
 function takeRecess(date,hour,minute){
   var tcS     = nameOpen("timeCard");
   var lastRow = tcS.getLastRow();
@@ -76,9 +80,10 @@ function takeRecess(date,hour,minute){
 }
 
 // 休憩終了
-// return :  0 正常終了
-//        : -1 異常終了：不正な状態遷移
-//        : -3 異常終了：入力時間が休憩開始より前
+// @paran  :   date:日付   hour:時   minute:分
+// @return :  0 正常終了
+//         : -1 異常終了：不正な状態遷移
+//         : -3 異常終了：入力時間が休憩開始より前
 function endRecess(date,hour,minute){
   var tcS     = nameOpen("timeCard");
   var lastRow = tcS.getLastRow();
@@ -101,11 +106,11 @@ function endRecess(date,hour,minute){
 
 
 // 退勤
-// return :  0 正常終了
-//        : -1 異常終了：不正な状態遷移
-//        : -2 異常終了：休憩回数上限超過
-//        : -3 異常終了：入力時間が前回休憩より前
-//        : -4 異常終了：入力時間が勤務開始より前
+// @return :  0 正常終了
+//         : -1 異常終了：不正な状態遷移
+//         : -2 異常終了：休憩回数上限超過
+//         : -3 異常終了：入力時間が前回休憩より前
+//         : -4 異常終了：入力時間が勤務開始より前
 function leaveWork(date,hour,minute){
   var tcS     = nameOpen("timeCard");
   var lastRow = tcS.getLastRow();
@@ -134,10 +139,10 @@ function leaveWork(date,hour,minute){
 
 
 // 状態を返す
-// arg[0]:最後のレコード arg[1]:最後の列の列番号　　
-// return : off       : 出勤前
-//          inWork    : 勤務中
-//          inRecess  : 休憩中
+// @param  : recode:最後のレコード   lastRow:最後の列の列番号　　
+// @return : off       : 出勤前
+//           inWork    : 勤務中
+//           inRecess  : 休憩中
 //      
 function getState(record,lastRow){
   var off     = "off";       // 出勤前の戻り値
@@ -152,16 +157,16 @@ function getState(record,lastRow){
 }
 
 // スプレッドシート用　経過時間を表すフォーマットに変換
-// arg    : hour:時 min:分
-// return : 経過時間 hh:mm:00.000
+// @param  : hour:時 min:分
+// @return : 経過時間 hh:mm:00.000
 function parseElapsedTime(hour,min){
   return (hour+":"+(("00"+(min)).slice(-2))+":00.000");
 }
 
 // 入力時間は適切か確認
-// return : more than 1(次に休憩時間を書き込む場所を示す) 適切＝正常
-//        : -3 異常：入力時間が前回休憩より前
-//        : -4 異常：入力時間が勤務開始より前
+// @return : more than 1(次に休憩時間を書き込む場所を示す) 適切＝正常
+//         : -3 異常：入力時間が前回休憩より前
+//         : -4 異常：入力時間が勤務開始より前
 function isTimeApropos(record,hour,minute){
   var recessIndex =  6;
   while(record[0][recessIndex]&&recessIndex<=12){
@@ -183,10 +188,10 @@ function isTimeApropos(record,hour,minute){
 }
 
 // 現在の状態など主要情報をHTMLに送る
-// return : result[0] 状態
-//        : result[1] 場所
-//        : result[2] 作業内容
-//        : result[3] 直近打刻情報
+// @return : result[0] 状態
+//         : result[1] 場所
+//         : result[2] 作業内容
+//         : result[3] 直近打刻情報
 function sendToHtml_state(){
   var tcS     = nameOpen("timeCard");
   var lastRow = tcS.getLastRow();
@@ -208,17 +213,18 @@ function sendToHtml_state(){
   return result;
 }
 
-
-// arg    : attribute レコードの属性情報
-//        : record    対象レコード
-//        : state     現在の状態
-// return : 直近打刻情報を格納したtableのhtml
+// 直近打刻情報のHTML Tableを取得する
+// @param  : attribute レコードの属性情報
+//         : record    対象レコード
+//         : state     現在の状態
+// @return : 直近打刻情報を格納したtableのhtml
 function loadPreRecodeTable(attribute,record,state){
   var recessIndex=6;
   if     (record[0][10])recessIndex=10
   else if(record[0][ 8])recessIndex= 8;
   
-  var table ="<table><tr><td colspan='4'>直近打刻情報</td></tr><tr>";
+  var table ="<table onclick='if(!VARS.isFixing)initializeToSheetLink();'>";
+  table += "<tr><td colspan='4'>直近打刻情報</td></tr><tr>";
   
   if(record[0][0])table+="<td>"+attribute[0][0]+"</td>";
   if(record[0][3])table+="<td>"+attribute[0][3]+"</td>";
