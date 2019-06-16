@@ -3,8 +3,8 @@
 自分の労働時間をつけるためのWebアプリonGAS
 
 ## How To install
-https://docs.google.com/spreadsheets/d/1aXLZwtNViqkgMdetY7syvUFACjkI80pWxvASC5E7j9o/edit?usp=sharing
-[(2019/5/19更新 コミット1fqaqb6版)](https://github.com/itanium-R/selfAttendanceManager/commit/1f9a9b6c595dcd874efcc8969a8653aef77bafd5)
+https://docs.google.com/spreadsheets/d/1H7XTX_fUvcBFvCuJKrdLS5ibG4hVpvNi0S2buoM9-dc/edit?usp=sharing
+[(2019/6/16更新 コミット678f856版)](https://github.com/itanium-R/selfAttendanceManager/tree/678f856e04900b0c31970ac36bf115f432e0998c)
 上記のシートをコピーし，
 ~~~
 ツール＞スクリプトエディタ
