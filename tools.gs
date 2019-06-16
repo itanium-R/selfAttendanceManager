@@ -52,5 +52,62 @@ function Sopen(id,name){
   }
   return sss;
 }
+//------------------------------------------------------------
+
+//アクティブスプレッドシートのnameシートを開く函数
+function openUsersSheetByName(name){
+  try{
+    const ss = SpreadsheetApp.getActiveSpreadsheet();   //アクティブスプレッドシートを開く->ss
+    const shtName = getUserName()+"-"+name;
+    if(isSheetExist(shtName)){
+      return ss.getSheetByName(shtName);   // 見つかったシートを開く
+    }else{
+      return createUsersShtFromTmpl(name); // シートがないときは作成する
+    }
+  }catch(e){  
+    //Logger.log(e);
+    return -1;
+  }
+}
 
 
+//------------------------------------------------------------
+
+
+function getUserName(){
+  try{
+    var userName = Session.getActiveUser().getEmail().split('@')[0];
+    //Logger.log(userName);
+    return userName;
+  }catch(e){
+    //Logger.log(e);
+    return -1;
+  }
+}
+
+
+function isSheetExist(shtName){
+  const ss =SpreadsheetApp.getActiveSpreadsheet();
+  const sheetCnt = ss.getNumSheets();
+  var sheet;
+  for(var i=0;i<sheetCnt;i++){
+    sheet = ss.getSheets()[i];
+    if(ss.getSheets()[i].getName()==shtName){
+      return true;
+    }
+  }
+  return false;
+}
+
+function createUsersShtFromTmpl(tmplName){
+  const userName = getUserName();
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const tmplSht  = nameOpen(tmplName);
+  const usersSht = tmplSht.copyTo(ss);
+  usersSht.setName(userName+"-"+tmplName);
+  return usersSht;
+}
+
+function test66(){
+  Logger.log(openUsersSheetByName("timeCard").getName());
+}

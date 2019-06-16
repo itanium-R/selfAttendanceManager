@@ -70,7 +70,7 @@ function takeRecess(date,hour,minute){
   if(record[0][10])return -2;
   // 時間が適切か確認
   hour = hour -0+ (24 * findDiffOfDate(record[0][0],date));
-  var recessIndex = isTimeApropos(record,hour,minute);
+  var recessIndex = getRecessIndexByTime(record,hour,minute);
   if(recessIndex < 0)return recessIndex;
   
   // 書込
@@ -95,7 +95,7 @@ function endRecess(date,hour,minute){
   
   // 時間が適切か確認
   hour = hour -0+ (24 * findDiffOfDate(record[0][0],date));
-  var recessIndex= isTimeApropos(record,hour,minute);
+  var recessIndex= getRecessIndexByTime(record,hour,minute);
   if(recessIndex < 0)return recessIndex;
   
   //書込
@@ -127,7 +127,7 @@ function leaveWork(date,hour,minute){
 
   // 時間が適切か確認
   hour = hour -0+ (24 * findDiffOfDate(record[0][0],date));
-  var recessIndex= isTimeApropos(record,hour,minute);
+  var recessIndex= getRecessIndexByTime(record,hour,minute);
   if(recessIndex < 0)return recessIndex;
   
   // 書込
@@ -167,7 +167,7 @@ function parseElapsedTime(hour,min){
 // @return : more than 1(次に休憩時間を書き込む場所を示す) 適切＝正常
 //         : -3 異常：入力時間が前回休憩より前
 //         : -4 異常：入力時間が勤務開始より前
-function isTimeApropos(record,hour,minute){
+function getRecessIndexByTime(record,hour,minute){
   var recessIndex =  6;
   while(record[0][recessIndex]&&recessIndex<=12){
     recessIndex+=1;
@@ -253,4 +253,37 @@ function loadPreRecodeTable(attribute,record,state){
   table += "</tr></table>"
   //Logger.log(table);
   return table;
+}
+
+// 最新打刻取消
+function deleteLastData(){  
+  var tcS     = nameOpen("timeCard");
+  var lastRow = tcS.getLastRow();
+  var record  = tcS.getRange(lastRow,2,1,14).getValues();
+  
+  var lastIndex = getLastIndex(record);  
+  if(lastIndex<0)return -9;//error
+  
+  // 出勤打刻が最新のときは行ごと消す
+  if(lastIndex==3){
+    tcS.deleteRow(lastRow);
+  }else{ //最新打刻を消す
+    tcS.getRange(lastRow,2+lastIndex).setValue("");
+  }
+  
+  return 0;
+}
+
+// 引数で与えられたrecordより，最後に入力された属性のindexを求める
+// @param  record    レコード
+// @return lastIndex 最後に入力された属性のindex
+function getLastIndex(record){
+  var indexList = [3,6,7,8,9,10,11,4];
+
+  for(var i=(indexList.length-1);i>=0;i--){
+    if(record[0][indexList[i]]!==""){
+      return indexList[i];
+    }
+  }
+  return -9; //error
 }
