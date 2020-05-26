@@ -36,10 +36,10 @@ function nameOpen(name){
   try{
     const ss = SpreadsheetApp.getActiveSpreadsheet(); //アクティブスプレッドシートを開く->ss
     const sss = ss.getSheetByName(name);              //nameという名前のシートを開く->sss
+    return sss;
   }catch(e){                                          //エラー発生時は表示
-    Browser.msgBox("シートを開けませんでした");
+    Browser.msgBox("シートを開けませんでした" + e);
   }
-  return sss;
 }
 
 //idスプレッドシートのnameシートを開く函数
